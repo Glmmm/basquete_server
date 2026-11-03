@@ -11,11 +11,18 @@ import java.util.List;
 @Entity
 @Table(name = "atleta")
 @PrimaryKeyJoinColumn(name = "id")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Atleta extends Usuario {
 
     @Column(nullable = false)
     private LocalDate dataNascimento;
+
+    @Column(nullable = false)
+    private Long camisa;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoria_base_id", nullable = false)

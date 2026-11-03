@@ -13,4 +13,7 @@ import java.util.List;
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
     @Query("SELECT a FROM Agendamento a WHERE a.dataHoraInicio >= :inicio AND a.dataHoraFim <= :fim")
     List<Agendamento> findByPeriodo(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+    @Query("SELECT a FROM Agendamento a WHERE TYPE(a) = Treino AND EXTRACT(YEAR FROM a.dataHoraInicio) = :ano")
+    List<Agendamento> findJogosTreinosPorAno(@Param("ano") int ano);
 }
