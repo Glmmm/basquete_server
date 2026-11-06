@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/categorias-base")
+@RequestMapping("/categorias-base")
 @RequiredArgsConstructor
 @Tag(name = "Categorias Base", description = "Endpoints para gerenciamento de categorias (Sub 13, Sub 17, Adulto)")
 public class CategoriaBaseController {

@@ -26,12 +26,21 @@ public class TokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = recoverToken(request);
-
         if (token != null) {
             var login = tokenService.validateToken(token);
-            UserDetails user = usuarioRepository.findByEmail(login);
-            var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(auth);
+            if (login != null && !login.isBlank()) {
+                UserDetails user = null;
+                try {
+                    user = usuarioRepository.findById(Long.parseLong(login)).orElse(null);
+                } catch (NumberFormatException ignored) {}
+                if (user == null) {
+                    user = usuarioRepository.findByEmail(login);
+                }
+                if (user != null) {
+                    var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            }
         }
         filterChain.doFilter(request, response);
     }

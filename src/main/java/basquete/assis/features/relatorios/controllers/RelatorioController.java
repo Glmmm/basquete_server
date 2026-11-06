@@ -1,46 +1,78 @@
 package basquete.assis.features.relatorios.controllers;
 
-
 import basquete.assis.features.relatorios.services.RelatorioService;
 import basquete.assis.shared.entities.Agendamento;
 import basquete.assis.shared.entities.AvaliacaoDesempenho;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import basquete.assis.shared.entities.Jogo;
+import basquete.assis.shared.entities.Treino;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import java.time.ZoneId;
+import java.util.*;
 
 @RestController
-@RequestMapping("/api/relatorios")
-@RequiredArgsConstructor
-@Tag(name = "Relatórios e Analytics", description = "Endpoints para emissão de relatórios gerenciais e estatísticas")
+@RequestMapping("/relatorios")
 public class RelatorioController {
 
     private final RelatorioService relatorioService;
 
+    public RelatorioController(RelatorioService relatorioService) {
+        this.relatorioService = relatorioService;
+    }
+
     @GetMapping("/desempenho-individual/{atletaId}")
-    @Operation(summary = "Emitir relatório de desempenho individual do atleta")
-    public ResponseEntity<List<AvaliacaoDesempenho>> relatorioDesempenhoIndividual(@PathVariable Long atletaId) {
-        return ResponseEntity.ok(relatorioService.gerarRelatorioDesempenhoIndividual(atletaId));
+    public ResponseEntity<List<Map<String, Object>>> relatorioDesempenhoIndividual(@PathVariable("atletaId") Long atletaId) {
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (AvaliacaoDesempenho a : relatorioService.gerarRelatorioDesempenhoIndividual(atletaId)) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", a.getId());
+            m.put("atletaId", a.getAtleta() != null ? a.getAtleta().getId() : atletaId);
+            m.put("treinoId", a.getTreino() != null ? a.getTreino().getId() : null);
+            m.put("notaFisica", a.getNotaFisica());
+            m.put("notaTatica", a.getNotaTatica());
+            m.put("notaTecnica", a.getNotaTecnica());
+            m.put("comentarios", a.getComentarios());
+            m.put("status", a.getStatus() != null ? a.getStatus().name() : null);
+            out.add(m);
+        }
+        return ResponseEntity.ok(out);
     }
 
     @GetMapping("/retrospectiva-ano/{ano}")
-    @Operation(summary = "Emitir retrospectiva de jogos e treinos por ano")
-    public ResponseEntity<List<Agendamento>> retrospectivaPorAno(@PathVariable int ano) {
-        return ResponseEntity.ok(relatorioService.gerarRetrospectivaPorAno(ano));
+    public ResponseEntity<List<Map<String, Object>>> retrospectivaPorAno(@PathVariable("ano") int ano) {
+        List<Map<String, Object>> out = new ArrayList<>();
+        for (Agendamento a : relatorioService.gerarRetrospectivaPorAno(ano)) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", a.getId() != null ? a.getId().toString() : null);
+            m.put("titulo", a.getTitulo());
+            m.put("local", a.getLocal());
+            m.put("inicio", a.getDataHoraInicio() != null ? a.getDataHoraInicio().atZone(ZoneId.systemDefault()).toOffsetDateTime().toString() : null);
+            m.put("fim", a.getDataHoraFim() != null ? a.getDataHoraFim().atZone(ZoneId.systemDefault()).toOffsetDateTime().toString() : null);
+            if (a instanceof Treino) {
+                m.put("tipo", "TREINO");
+                m.put("foco", ((Treino) a).getTipoTreino());
+            } else if (a instanceof Jogo) {
+                Jogo j = (Jogo) a;
+                m.put("tipo", "JOGO");
+                m.put("adversario", j.getAdversario());
+                m.put("mandante", j.getMandante());
+                m.put("placarTime", j.getPlacarTime());
+                m.put("placarAdversario", j.getPlacarAdversario());
+            } else {
+                m.put("tipo", "EVENTO");
+            }
+            out.add(m);
+        }
+        return ResponseEntity.ok(out);
     }
 
     @GetMapping("/distribuicao-categorias")
-    @Operation(summary = "Obter distribuição de atletas por categoria base")
     public ResponseEntity<Map<String, Long>> distribuicaoPorCategoria() {
         return ResponseEntity.ok(relatorioService.gerarDistribuicaoPorCategoria());
     }
 
     @GetMapping("/extrato-estoque")
-    @Operation(summary = "Emitir extrato de estoque e suprimentos")
     public ResponseEntity<Map<String, Object>> extratoEstoque() {
         return ResponseEntity.ok(relatorioService.gerarExtratoEstoqueSimulado());
     }

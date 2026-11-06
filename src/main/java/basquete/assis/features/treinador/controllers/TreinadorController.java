@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/treinadores")
+@RequestMapping("/treinadores")
 @RequiredArgsConstructor
 @Tag(name = "Treinadores", description = "Endpoints para gerenciamento de treinadores")
 public class TreinadorController {

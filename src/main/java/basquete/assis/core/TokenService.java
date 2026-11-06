@@ -18,11 +18,20 @@ public class TokenService   {
     private String secret;
 
     public String generateToken(Usuario user) {
-        try{
+        try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
+            String roleName = user.getRole() != null ? "ROLE_" + user.getRole().name() : null;
+            if (user.getRole() != null && user.getRole().name().startsWith("ROLE_")) {
+                roleName = user.getRole().name();
+            }
+            String sub = user.getId() != null ? user.getId().toString() : user.getEmail();
             return JWT.create()
                     .withIssuer("auth")
-                    .withSubject(user.getEmail())
+                    .withSubject(sub)
+                    .withClaim("email", user.getEmail())
+                    .withClaim("nome", user.getNome())
+                    .withClaim("role", roleName)
+                    .withArrayClaim("roles", roleName != null ? new String[]{roleName} : new String[]{})
                     .withExpiresAt(genExpirationDate())
                     .sign(algorithm);
 

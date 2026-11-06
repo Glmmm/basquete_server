@@ -8,7 +8,6 @@ import lombok.*;
 @Getter @Setter
 @PrimaryKeyJoinColumn(name = "id")
 @NoArgsConstructor @AllArgsConstructor
-@PrimaryKeyJoinColumn(name = "agendamento_id")
 public class Treino extends Agendamento {
     @Column(nullable = false)
     private String tipoTreino;

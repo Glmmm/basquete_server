@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/treinos")
+@RequestMapping("/treinos")
 @RequiredArgsConstructor
 @Tag(name = "Treinos e Presenças", description = "Gestão de treinos, agendamentos e chamada de presença")
 public class TreinoController {

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/avaliacoes-desempenho")
+@RequestMapping("/avaliacoes-desempenho")
 @RequiredArgsConstructor
 @Tag(name = "Avaliação de Desempenho", description = "Gestão de notas físicas, táticas, técnicas e comentários dos atletas")
 public class AvaliacaoDesempenhoController {
