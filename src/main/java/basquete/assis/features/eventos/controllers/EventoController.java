@@ -196,24 +196,40 @@ public class EventoController {
                 final Atleta at = at0;
                 final Agendamento ag = agendamentoRepository.findById(lid).orElse(null);
                 if (at != null && ag != null) {
+                    Optional<Presenca> existente = presencaRepository.findByAgendamentoId(lid).stream()
+                            .filter(x -> x.getAtleta() != null && x.getAtleta().getId() != null && x.getAtleta().getId().equals(at.getId()))
+                            .findFirst();
+                    if (existente.isEmpty()) {
+                        return ResponseEntity.status(403).body(Map.of("message", "Só é possível confirmar presença após a convocação."));
+                    }
                     StatusPresenca sp = "CONFIRMADO".equalsIgnoreCase(statusStr) || "PRESENTE".equalsIgnoreCase(statusStr)
                             ? StatusPresenca.PRESENTE
                             : ("JUSTIFICADO".equalsIgnoreCase(statusStr) ? StatusPresenca.JUSTIFICADO
                                 : ("AUSENTE".equalsIgnoreCase(statusStr) ? StatusPresenca.AUSENTE : StatusPresenca.PENDENTE));
-                    Presenca p = presencaRepository.findByAgendamentoId(lid).stream()
-                            .filter(x -> x.getAtleta() != null && x.getAtleta().getId() != null && x.getAtleta().getId().equals(at.getId()))
-                            .findFirst().orElseGet(() -> { Presenca np = new Presenca(); np.setAtleta(at); np.setAgendamento(ag); return np; });
+                    Presenca p = existente.get();
                     p.setStatus(sp);
                     p.setDataConfirmacao(java.time.LocalDateTime.now());
                     presencaRepository.save(p);
+                    return ResponseEntity.ok(toClient(ag));
                 }
             }
-        } catch (Exception ignored) {}
-        Map<String, Object> resp = new HashMap<>();
-        resp.put("eventoId", id);
-        resp.put("status", statusStr);
+        } catch (Exception e) {
+            if (e.getClass().getName().contains("ResponseStatus") || e instanceof RuntimeException && e.getMessage() != null && e.getMessage().contains("convocação")) {
+                // não mascarar
+            }
+        }
         Map<String, Object> fb = FALLBACK.get(id);
-        if (fb != null) fb.put("minhaPresenca", statusStr);
+        if (fb != null) {
+            fb.put("id", id);
+            fb.put("minhaPresenca", statusStr);
+            return ResponseEntity.ok(fb);
+        }
+        // último recurso: devolve shape mínimo compatível
+        Map<String, Object> resp = new HashMap<>();
+        resp.put("id", id);
+        resp.put("eventoId", id);
+        resp.put("minhaPresenca", statusStr);
+        resp.put("status", statusStr);
         return ResponseEntity.ok(resp);
     }
 

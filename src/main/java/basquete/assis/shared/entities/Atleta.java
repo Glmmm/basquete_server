@@ -5,7 +5,6 @@ import basquete.assis.features.auth.models.RegistroAtletaForm;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -15,11 +14,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder 
+@Builder
 public class Atleta extends Usuario {
-
-    @Column(nullable = false)
-    private LocalDate dataNascimento;
 
     @Column(nullable = false)
     private Long camisa;

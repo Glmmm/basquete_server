@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,6 +31,14 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    private String cpf;
+
+    private String telefone;
+
+    private LocalDate dataNascimento;
+
+    private String fotoUrl;
 
     public Usuario() {
     }
@@ -59,6 +68,14 @@ public class Usuario implements UserDetails {
     public void setSenhaHash(String senhaHash) { this.senhaHash = senhaHash; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
+    public LocalDate getDataNascimento() { return dataNascimento; }
+    public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
+    public String getFotoUrl() { return fotoUrl; }
+    public void setFotoUrl(String fotoUrl) { this.fotoUrl = fotoUrl; }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -52,8 +52,8 @@ public class AdapterController {
                     t.put("nome", u.getNome());
                     t.put("cargo", "Treinador");
                     t.put("email", u.getEmail());
-                    t.put("telefone", "");
-                    t.put("fotoUrl", null);
+                    t.put("telefone", u.getTelefone() != null ? u.getTelefone() : "");
+                    t.put("fotoUrl", u.getFotoUrl());
                     comissao.add(t);
                 }
             }
@@ -68,12 +68,13 @@ public class AdapterController {
                 e.put("id", id);
                 e.put("nome", a.getNome());
                 e.put("email", a.getEmail());
-                e.put("cpf", "");
+                e.put("cpf", a.getCpf() != null ? a.getCpf() : "");
                 e.put("dataNascimento", a.getDataNascimento() != null ? a.getDataNascimento().toString() : null);
-                e.put("telefone", "");
+                e.put("telefone", a.getTelefone() != null ? a.getTelefone() : "");
                 e.put("numero", a.getCamisa() != null ? a.getCamisa() : 0);
                 e.put("posicao", "ALA");
                 e.put("ativo", true);
+                e.put("fotoUrl", a.getFotoUrl());
                 byId.put(id, e);
             }
         } catch (Exception ignored) {}
